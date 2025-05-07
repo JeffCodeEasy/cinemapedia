@@ -162,7 +162,7 @@ Movie _movieDeserialize(
     overview: reader.readString(offsets[6]),
     popularity: reader.readDouble(offsets[7]),
     posterPath: reader.readString(offsets[8]),
-    releaseDate: reader.readDateTimeOrNull(offsets[9]),
+    releaseDate: reader.readDateTime(offsets[9]),
     title: reader.readString(offsets[10]),
     video: reader.readBool(offsets[11]),
     voteAverage: reader.readDouble(offsets[12]),

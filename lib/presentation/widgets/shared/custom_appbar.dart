@@ -1,6 +1,6 @@
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/presentation/delegates/search_movie_delegate.dart';
-import 'package:cinemapedia/presentation/providers/search/search_movie_provider.dart';
+import 'package:cinemapedia/presentation/providers/movies.dart';
 import 'package:cinemapedia/presentation/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +13,8 @@ class CustomAppbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final titleStyle = Theme.of(context).textTheme.titleMedium;
+    final size = MediaQuery.of(context).size;
+    final isDarkMode = ref.watch(themeNotifierProvider).isDarkMode;
 
     return SafeArea(
       child: Padding(
@@ -21,15 +23,30 @@ class CustomAppbar extends ConsumerWidget {
           width: double.infinity,
           child: Row(
             children: [
+              IconButton(
+                onPressed: () {
+                  ref.read(themeNotifierProvider.notifier).changeDarkMode();
+                },
+                icon: isDarkMode
+                    ? Icon(
+                        Icons.dark_mode_outlined,
+                        color: colors.primary,
+                      )
+                    : Icon(
+                        Icons.light_mode_outlined,
+                        color: colors.primary,
+                      ),
+              ),
+              SizedBox(width: size.width * 0.2),
               Icon(Icons.movie_outlined, color: colors.primary),
               const SizedBox(width: 5),
               Text('Cinemapedia', style: titleStyle),
               const Spacer(),
               IconButton(
-                onPressed: () {
+                onPressed: () async {
                   final searchedMovies = ref.read(searchedMoviesProvider);
                   final searchQuery = ref.read(searchQueryProvider);
-                  showSearch<Movie?>(
+                  final movie = await showSearch<Movie?>(
                     query: searchQuery,
                     context: context,
                     delegate: SearchMovieDelegate(
@@ -38,14 +55,13 @@ class CustomAppbar extends ConsumerWidget {
                           .read(searchedMoviesProvider.notifier)
                           .searchMoviesByQuery,
                     ),
-                  ).then(
-                    (movie) {
-                      if (movie == null) return;
-                      context.goNamed(
-                        MovieScreen.name,
-                        pathParameters: {'id': movie.id.toString()},
-                      );
-                    },
+                  );
+
+                  if (!context.mounted || movie == null) return;
+
+                  context.goNamed(
+                    MovieScreen.name,
+                    pathParameters: {'id': movie.id.toString()},
                   );
                 },
                 icon: Icon(

@@ -14,6 +14,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   StreamController<List<Movie>> debouncedMovies = StreamController.broadcast();
   StreamController<bool> isLoadingStream = StreamController.broadcast();
   Timer? _debounceTimer;
+  bool _isClosed = false; // Verificar sí esta cerrado el stream debouncedMovies
 
   SearchMovieDelegate({
     required this.initialMovies,
@@ -21,6 +22,8 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   }) : super(searchFieldLabel: 'Buscar película');
 
   void _onQueryChanged(String query) {
+    if (_isClosed) return;
+
     isLoadingStream.add(true);
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
 
@@ -28,8 +31,11 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
       //   if (query.isEmpty) {
       //   debouncedMovies.add([]);
       // }
+      if (_isClosed) return; // Sí se cerro el stream termina
 
       final movies = await searchMovies(query);
+      if (_isClosed) return; // Sí se cerro el stream termina
+
       initialMovies = movies;
       debouncedMovies.add(movies);
       isLoadingStream.add(false);
@@ -37,6 +43,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   }
 
   void clearStreams() {
+    _isClosed = true;
     debouncedMovies.close();
   }
 
