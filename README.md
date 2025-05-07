@@ -16,3 +16,7 @@ dart run build_runner build
 3. Sí tienes errores al compilar cambia en el setting.gradle: id "org.jetbrains.kotlin.android" version "1.7.10" apply false por "1.9.0"
 
 ![Preview](assets/readme/settings_gradle.png)
+
+## Preview
+![Demo](assets/readme/demo.gif)
+

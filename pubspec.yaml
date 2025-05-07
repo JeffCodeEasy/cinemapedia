@@ -34,4 +34,3 @@ flutter:
 
   assets:
     - .env
-    - assets/readme/settings_gradle.png
